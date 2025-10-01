@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { formatDistanceToNow } from "date-fns"; // ✅ for "2 hours ago"
 import { BASE_URL } from "../utils/constants";
 import CreatePost from "../components/CreatePost";
+import { FaRegThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
+
+// Capitalize first letter helper
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -11,9 +16,7 @@ const Posts = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(BASE_URL + "/post/allpost", {
-        withCredentials: true,
-      });
+      const res = await axios.get(BASE_URL + "/post/allpost", { withCredentials: true });
       setPosts(res.data);
       setError("");
     } catch (err) {
@@ -22,16 +25,6 @@ const Posts = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getUserDisplayName = (post) => {
-    if (!post.userId) return "Unknown User";
-    if (typeof post.userId === "object" && post.userId !== null) {
-      const firstName = post.userId.firstName || "";
-      const lastName = post.userId.lastName || "";
-      return `${firstName} ${lastName}`.trim() || "Unknown User";
-    }
-    return "Unknown User";
   };
 
   useEffect(() => {
@@ -47,32 +40,8 @@ const Posts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-10 px-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <CreatePost onPostCreated={fetchPosts} />
-
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">All Posts</h2>
-          <button
-            onClick={fetchPosts}
-            disabled={loading}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
-          >
-            <svg
-              className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Refresh
-          </button>
-        </div>
 
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200">
@@ -87,36 +56,58 @@ const Posts = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-6">
             {posts.map((post) => (
               <div
                 key={post._id}
-                className="bg-gradient-to-br from-gray-800 to-blue-900/70 rounded-2xl p-6 shadow-xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300"
+                className="bg-gradient-to-br from-gray-800 to-blue-900/70 rounded-2xl p-5 shadow-xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300"
               >
-                {post.image && (
+                {/* 🔹 User Info */}
+                <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={post.image}
-                    alt="Post"
-                    className="w-full h-64 object-cover rounded-2xl mb-4"
-                    onError={(e) => (e.target.style.display = "none")}
+                    src={post.userId?.photoUrl || "/default-avatar.png"}
+                    alt="User"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
                   />
-                )}
-                <p className="text-white font-semibold mb-2">
-                  {post.description}
-                </p>
-                <div className="flex items-center text-blue-200 mb-1">
-                  <span className="mr-2">👤</span>
-                  <span>
-                    {getUserDisplayName(post)
-                      ? getUserDisplayName(post).charAt(0).toUpperCase() +
-                        getUserDisplayName(post).slice(1).toLowerCase()
-                      : ""}
-                  </span>
+                  <div>
+                    <p className="text-white font-semibold">
+                      {capitalize(post.userId?.firstName)} {capitalize(post.userId?.lastName)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                    </p>
+                  </div>
                 </div>
 
-                <p className="text-xs text-gray-400">
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
+                {/* 🔹 Post Text */}
+                {post.description && (
+                  <p className="text-white mb-4">{post.description}</p>
+                )}
+
+                {/* 🔹 Post Image */}
+                {post.image && (
+                  <div className="w-full">
+                    <img
+                      src={post.image}
+                      alt="Post"
+                      className="w-full max-h-[300px] object-cover rounded-xl"
+                      onError={(e) => (e.target.style.display = "none")}
+                    />
+                  </div>
+                )}
+
+                {/* 🔹 Like / Comment / Share */}
+                <div className="flex justify-around items-center mt-4 text-gray-300 border-t border-gray-700 pt-3">
+                  <button className="flex items-center gap-2 hover:text-blue-400 transition">
+                    <FaRegThumbsUp /> Like
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-green-400 transition">
+                    <FaRegCommentDots /> Comment
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-purple-400 transition">
+                    <FaShare /> Share
+                  </button>
+                </div>
               </div>
             ))}
           </div>

@@ -44,7 +44,7 @@ const NavBar = () => {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-11 rounded-full ring ring-white-400 ring-offset-2 ring-offset-gray-900">
+              <div className="w-10 rounded-full ring ring-white-100 ring-offset-2 ring-offset-gray-900">
                 <img alt="user photo" src={user.photoUrl} />
               </div>
             </div>

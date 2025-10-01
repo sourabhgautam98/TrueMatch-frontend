@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import EditProfile from "./EditProfile";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -10,11 +10,13 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState({}); // Track dropdown state
+  const dropdownRefs = useRef({}); // Refs for each dropdown
 
   const handleEditClick = () => setIsEditing(true);
   const handleCloseEdit = () => setIsEditing(false);
 
-  // 👉 Fetch posts created by this user
+  // Fetch posts created by this user
   const fetchMyPosts = async () => {
     setLoading(true);
     try {
@@ -29,20 +31,36 @@ export default function Profile() {
     }
   };
 
-  // 👉 Delete a post
+  // Delete a post
   const handleDelete = async (postId) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
-
     try {
       await axios.delete(`${BASE_URL}/post/delete/${postId}`, {
         withCredentials: true,
       });
-      // Refresh after deletion
       setPosts((prev) => prev.filter((p) => p._id !== postId));
     } catch (err) {
       console.error("Error deleting post:", err);
     }
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      let clickedOutside = true;
+      for (const key in dropdownRefs.current) {
+        if (dropdownRefs.current[key]?.contains(event.target)) {
+          clickedOutside = false;
+          break;
+        }
+      }
+      if (clickedOutside) {
+        setDropdownOpen({});
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (user) fetchMyPosts();
@@ -58,29 +76,29 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-10 px-4">
-      {isEditing ? (
-        <EditProfile user={user} onClose={handleCloseEdit} />
-      ) : (
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-white">My Profile</h1>
-              <p className="text-blue-300 mt-2">
-                View and manage your profile information
-              </p>
+      <div className="max-w-3xl mx-auto">
+        {isEditing ? (
+          <EditProfile user={user} onClose={handleCloseEdit} />
+        ) : (
+          <>
+            {/* Header */}
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-4xl font-bold text-white">My Profile</h1>
+                <p className="text-blue-300 mt-2">
+                  View and manage your profile information
+                </p>
+              </div>
+              <button
+                onClick={handleEditClick}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg"
+              >
+                Edit Profile
+              </button>
             </div>
-            <button
-              onClick={handleEditClick}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg"
-            >
-              Edit Profile
-            </button>
-          </div>
 
-          {/* Profile Info */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-blue-700/30">
+            {/* Profile Info */}
+            <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-blue-700/30 mb-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="relative">
                   <img
@@ -89,7 +107,6 @@ export default function Profile() {
                     src={user.photoUrl || "/default-avatar.png"}
                   />
                 </div>
-
                 <div className="text-center md:text-left flex-1">
                   <h2 className="text-3xl font-bold text-white mb-2">
                     {user.firstName.charAt(0).toUpperCase() +
@@ -110,84 +127,124 @@ export default function Profile() {
                       </span>
                     )}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30">
-              <h3 className="text-2xl font-bold text-white mb-4">Skills</h3>
-              <div className="flex flex-wrap gap-2">
-                {user.skills && user.skills.length > 0 ? (
-                  user.skills.map(
-                    (skill, index) =>
-                      skill.trim() && (
+                  {user.skills && user.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {user.skills.map((skill, idx) => (
                         <span
-                          key={index}
+                          key={idx}
                           className="border border-blue-400 rounded-full px-3 py-1 text-sm bg-blue-900/20 text-blue-200"
                         >
                           {skill.charAt(0).toUpperCase() +
                             skill.slice(1).toLowerCase()}
                         </span>
-                      )
-                  )
-                ) : (
-                  <p className="text-gray-400 italic">No skills added yet</p>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Create Post */}
-          <div className="mt-8 bg-gradient-to-br from-gray-900/50 to-blue-900/50 rounded-2xl p-6 shadow-xl border border-blue-700/30">
+            {/* Create Post */}
+
             <CreatePost onPostCreated={fetchMyPosts} />
-          </div>
 
-          {/* My Posts */}
-          <div className="mt-8 bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30">
-            <h3 className="text-2xl font-bold text-white mb-4">My Posts</h3>
-
-            {loading ? (
-              <p className="text-gray-400">Loading posts...</p>
-            ) : posts.length === 0 ? (
-              <p className="text-gray-400 italic">
-                You haven’t created any posts yet
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                {posts.map((post) => (
-                  <div
-                    key={post._id}
-                    className="bg-gradient-to-br from-gray-800 to-blue-900/70 rounded-2xl p-6 shadow-xl border border-blue-700/30"
-                  >
-                    {post.image && (
-                      <img
-                        src={post.image}
-                        alt="Post"
-                        className="w-full h-64 object-cover rounded-2xl mb-4"
-                      />
-                    )}
-                    <p className="text-white font-semibold mb-2">
-                      {post.description}
-                    </p>
-                    <p className="text-xs text-gray-400 mb-4">
-                      {new Date(post.createdAt).toLocaleString()}
-                    </p>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleDelete(post._id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-all"
+            {/* My Posts */}
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-4">My Posts</h3>
+              {loading ? (
+                <p className="text-gray-400">Loading posts...</p>
+              ) : posts.length === 0 ? (
+                <p className="text-gray-400 italic">
+                  You haven’t created any posts yet
+                </p>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {posts.map((post) => (
+                    <div
+                      key={post._id}
+                      className="bg-gradient-to-br from-gray-800 to-blue-900/70 rounded-2xl p-5 shadow-xl border border-blue-700/30 relative"
                     >
-                      Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                      {/* User Info + Dropdown */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={user.photoUrl || "/default-avatar.png"}
+                            alt="User"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
+                          />
+                          <div>
+                            <p className="text-white font-semibold">
+                              {user.firstName
+                                ? user.firstName.charAt(0).toUpperCase() +
+                                  user.firstName.slice(1).toLowerCase()
+                                : ""}{" "}
+                              {user.lastName
+                                ? user.lastName.charAt(0).toUpperCase() +
+                                  user.lastName.slice(1).toLowerCase()
+                                : ""}
+                            </p>
+
+                            <p className="text-xs text-gray-400">
+                              {new Date(post.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 3-dot Dropdown */}
+                        <div
+                          ref={(el) => (dropdownRefs.current[post._id] = el)}
+                          className="relative"
+                        >
+                          <button
+                            onClick={() =>
+                              setDropdownOpen((prev) => ({
+                                ...prev,
+                                [post._id]: !prev[post._id],
+                              }))
+                            }
+                            className="text-gray-400 hover:text-white text-2xl font-bold"
+                          >
+                            ⋮
+                          </button>
+                          {dropdownOpen[post._id] && (
+                            <ul className="absolute right-0 mt-2 w-32 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10">
+                              <li>
+                                <button
+                                  onClick={() => handleDelete(post._id)}
+                                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700 rounded-lg"
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Post Text */}
+                      {post.description && (
+                        <p className="text-white mb-4">{post.description}</p>
+                      )}
+
+                      {/* Post Image */}
+                      {post.image && (
+                        <div className="w-full">
+                          <img
+                            src={post.image}
+                            alt="Post"
+                            className="w-full max-h-[400px] object-cover rounded-xl"
+                            onError={(e) => (e.target.style.display = "none")}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

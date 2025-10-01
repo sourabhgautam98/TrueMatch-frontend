@@ -36,10 +36,8 @@ const EditProfile = ({ user, onClose }) => {
 
       dispatch(addUser(res.data.data));
       setMessage(res.data.message);
-      
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+
+      setTimeout(() => onClose(), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile");
     } finally {
@@ -63,10 +61,13 @@ const EditProfile = ({ user, onClose }) => {
     }
   }, [user]);
 
+  const capitalize = (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-10 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Edit Profile</h1>
             <p className="text-blue-300">Update your personal information</p>
@@ -80,12 +81,11 @@ const EditProfile = ({ user, onClose }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30">
+          {/* Form Panel */}
+          <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30 w-full">
             <div className="space-y-4">
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  First Name
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">First Name</label>
                 <input
                   type="text"
                   value={firstName}
@@ -96,9 +96,7 @@ const EditProfile = ({ user, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Last Name
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">Last Name</label>
                 <input
                   type="text"
                   value={lastName}
@@ -109,9 +107,7 @@ const EditProfile = ({ user, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Photo URL
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">Photo URL</label>
                 <input
                   type="text"
                   value={photoUrl}
@@ -122,9 +118,7 @@ const EditProfile = ({ user, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Age
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">Age</label>
                 <input
                   type="number"
                   value={age}
@@ -135,17 +129,13 @@ const EditProfile = ({ user, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Gender
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">Gender</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
                   className="w-full bg-gray-700/50 border border-blue-500/30 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="" disabled>
-                    Select gender
-                  </option>
+                  <option value="" disabled>Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
@@ -153,32 +143,28 @@ const EditProfile = ({ user, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Skills (comma separated)
-                </label>
+                <label className="block text-blue-200 text-sm font-medium mb-2">Skills (comma separated)</label>
                 <input
                   type="text"
                   value={skills.join(", ")}
                   className="w-full bg-gray-700/50 border border-blue-500/30 rounded-xl py-3 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   onChange={(e) =>
-                    setSkills(
-                      e.target.value.split(",").map((skill) => skill.trim())
-                    )
+                    setSkills(e.target.value.split(",").map((skill) => skill.trim()))
                   }
                   placeholder="e.g. JavaScript, React, Node.js"
                 />
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-4">
                 <button
                   onClick={saveProfile}
                   disabled={isSaving}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg disabled:opacity-50 disabled:transform-none"
                 >
                   {isSaving ? (
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center gap-2">
                       <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        className="animate-spin -ml-1 h-5 w-5 text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -203,7 +189,7 @@ const EditProfile = ({ user, onClose }) => {
                     "Save Profile"
                   )}
                 </button>
-                
+
                 <button
                   onClick={onClose}
                   disabled={isSaving}
@@ -215,80 +201,64 @@ const EditProfile = ({ user, onClose }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">
-              Profile Preview
+          {/* Profile Preview */}
+          <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30 w-full flex flex-col items-center text-center">
+            <h2 className="text-2xl font-bold text-white mb-6">Profile Preview</h2>
+
+            <img
+              alt="profile preview"
+              className="w-24 h-24 rounded-2xl object-cover border-4 border-blue-500/30 shadow-lg mb-4"
+              src={photoUrl || "/default-avatar.png"}
+            />
+
+            <h2 className="text-xl font-bold text-white mb-1">
+              {capitalize(firstName)} {capitalize(lastName)}
             </h2>
 
-            <div className="flex flex-col items-center text-center">
-              <div className="relative mb-4">
-                <img
-                  alt="profile preview"
-                  className="w-24 h-24 rounded-2xl object-cover border-4 border-blue-500/30 shadow-lg"
-                  src={photoUrl || "/default-avatar.png"}
-                />
+            {(age || gender) && (
+              <div className="flex flex-wrap justify-center gap-3 mb-4">
+                {age && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900/50 text-blue-200 text-sm">
+                    {age} years
+                  </span>
+                )}
+                {gender && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-900/50 text-purple-200 text-sm">
+                    {capitalize(gender)}
+                  </span>
+                )}
               </div>
+            )}
 
-              <h2 className="text-xl font-bold text-white mb-1">
-                {firstName
-                  ? firstName.charAt(0).toUpperCase() +
-                    firstName.slice(1).toLowerCase()
-                  : "First"}{" "}
-                {lastName
-                  ? lastName.charAt(0).toUpperCase() +
-                    lastName.slice(1).toLowerCase()
-                  : "Last"}
-              </h2>
-
-              {(age || gender) && (
-                <div className="flex flex-wrap justify-center gap-3 mb-4">
-                  {age && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900/50 text-blue-200 text-sm">
-                      {age} years
-                    </span>
-                  )}
-                  {gender && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-900/50 text-purple-200 text-sm">
-                      {gender.charAt(0).toUpperCase() + gender.slice(1)}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div className="w-full">
-                <h3 className="font-semibold text-white mb-2">Skills</h3>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {skills && skills.length > 0 ? (
-                    skills.map(
-                      (skill, index) =>
-                        skill.trim() && (
-                          <span
-                            key={index}
-                            className="border border-blue-400 rounded-full px-3 py-1 text-sm bg-blue-900/20 text-blue-200"
-                          >
-                            {skill.charAt(0).toUpperCase() +
-                              skill.slice(1).toLowerCase()}
-                          </span>
-                        )
-                    )
-                  ) : (
-                    <p className="text-gray-400 italic text-sm">
-                      No skills listed
-                    </p>
-                  )}
-                </div>
+            <div className="w-full">
+              <h3 className="font-semibold text-white mb-2">Skills</h3>
+              <div className="flex flex-wrap justify-center gap-2">
+                {skills.length > 0 ? (
+                  skills.map((skill, index) =>
+                    skill.trim() ? (
+                      <span
+                        key={index}
+                        className="border border-blue-400 rounded-full px-3 py-1 text-sm bg-blue-900/20 text-blue-200"
+                      >
+                        {capitalize(skill)}
+                      </span>
+                    ) : null
+                  )
+                ) : (
+                  <p className="text-gray-400 italic text-sm">No skills listed</p>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Notifications */}
       {message && (
         <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg">
           {message}
         </div>
       )}
-
       {error && (
         <div className="fixed top-5 right-5 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
           {error}
