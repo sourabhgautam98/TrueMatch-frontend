@@ -1,12 +1,38 @@
-# React + Vite
+# TrueMatch Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![TrueMatch Logo](./public/logo.png)
 
-Currently, two official plugins are available:
+**TrueMatch** is the frontend application for a matchmaking / social connection platform. It is built using React + Vite, with modern tooling and best-practices in mind.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Responsive, user-friendly UI  
+- Real-time interactions / matching (if backend supports WebSockets or API)  
+- Profile, connection, find friends , post, requests 
+- Authentication & authorization flows (signup, login, password reset)  
+- Smooth animations & state management  
+- ESLint + code quality checks  
+
+---
+
+## 📦 Tech Stack
+
+| Layer       | Technology / Library             |
+|-------------|----------------------------------|
+| Framework    | React (with Vite)                 |
+| Build Tool   | Vite                              |
+| Linting      | ESLint                            |
+| Styling      | Tailwind CSS                      |
+| State / Data | useState, Redux                   |
+| API / Backend| REST API                           |
+
+---
+
+## 🛠️ Setup & Installation
+
+1. Clone this repository  
+   ```bash
+   git clone https://github.com/sourabhgautam98/TrueMatch-frontend.git
+   cd TrueMatch-frontend
