@@ -1,10 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi"; 
+import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -13,21 +14,23 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        BASE_URL + "/auth/login",
-        { emailId, password },
-        { withCredentials: true }
-      );
+      const res = await axios.post(BASE_URL + "/auth/login", {
+        emailId,
+        password,
+      });
 
       if (res.status === 200) {
-        const profileRes = await axios.get(BASE_URL + "/profile/view", {
+        Cookies.set("token", res.data.token);
+        const token = Cookies.get("token");
+        const profileRes = await axios.get(`${BASE_URL}/profile/view`, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
 

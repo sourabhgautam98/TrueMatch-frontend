@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
@@ -14,7 +15,9 @@ const Body = () => {
   const fetchUser = async () => {
     if (userData) return;
     try {
-      const res = await axios.get(BASE_URL + "/profile/view", {
+      const token = Cookies.get("token");
+      const res = await axios.get(`${BASE_URL}/profile/view`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       dispatch(addUser(res.data));
