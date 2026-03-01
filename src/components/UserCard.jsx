@@ -94,8 +94,8 @@ const UserCard = ({ user, onActionComplete }) => {
           onClick={() => handleSendRequest("ignored", _id)}
           disabled={processing}
           className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${processing && actionType === "ignored"
-              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-gray-700 hover:bg-gray-800 text-white"
+            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+            : "bg-gray-700 hover:bg-gray-800 text-white"
             }`}
         >
           {processing && actionType === "ignored" ? "Processing..." : "Ignore"}
@@ -104,8 +104,8 @@ const UserCard = ({ user, onActionComplete }) => {
           onClick={() => handleSendRequest("interested", _id)}
           disabled={processing}
           className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${processing && actionType === "interested"
-              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
         >
           {processing && actionType === "interested" ? "Sending..." : "Interested"}

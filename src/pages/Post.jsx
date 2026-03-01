@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { BASE_URL } from "../utils/constants";
 import CreatePost from "../components/CreatePost";
 import { FaRegThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 // Capitalize first letter helper
 const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -13,15 +14,16 @@ const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const user = useSelector((store) => store.user);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
       const token = Cookies.get("token");
-      const res = await axios.get(BASE_URL + "/post/allpost", {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+        : {};
+      const res = await axios.get(BASE_URL + "/post/allpost", config);
       setPosts(res.data);
       setError("");
     } catch (err) {
@@ -46,7 +48,8 @@ const Posts = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <CreatePost onPostCreated={fetchPosts} />
+        {/* Only show CreatePost if logged in */}
+        {user && <CreatePost onPostCreated={fetchPosts} />}
 
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200">

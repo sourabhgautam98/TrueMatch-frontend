@@ -60,7 +60,7 @@ const CreatePost = ({ onPostCreated }) => {
       className="mb-10 p-6 rounded-2xl bg-gradient-to-br from-gray-800 to-blue-900 shadow-xl border border-blue-700/30"
     >
       <div className="flex flex-col sm:flex-row items-start gap-4">
-        {/* ✅ User Avatar */}
+        {/* User Avatar */}
         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500 flex-shrink-0">
           <img
             src={user?.photoUrl || "/default-avatar.png"}
@@ -80,14 +80,14 @@ const CreatePost = ({ onPostCreated }) => {
               : "Create Post"}
           </h2>
 
-          {/* 🔹 Error */}
+          {/* Error */}
           {error && (
             <div className="mb-3 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200">
               {error}
             </div>
           )}
 
-          {/* 🔹 Post text */}
+          {/* Post text */}
           <textarea
             placeholder="What's on your mind?"
             value={description}
@@ -100,7 +100,7 @@ const CreatePost = ({ onPostCreated }) => {
             disabled={creatingPost}
           />
 
-          {/* 🔹 Image URL field (only appears if user typed text) */}
+          {/* Image URL field (only appears if user typed text) */}
           {description.trim() && (
             <input
               type="url"
@@ -115,7 +115,7 @@ const CreatePost = ({ onPostCreated }) => {
             />
           )}
 
-          {/* 🔹 Buttons */}
+          {/* Buttons */}
           <div className="flex flex-wrap gap-3 justify-end">
             {(description.trim() || url.trim()) && (
               <button

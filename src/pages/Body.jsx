@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -10,12 +10,20 @@ import { useEffect } from "react";
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const userData = useSelector((store) => store.user);
 
   const fetchUser = async () => {
     if (userData) return;
     try {
       const token = Cookies.get("token");
+      if (!token) {
+        // No token — only redirect if not on home page
+        if (location.pathname !== "/") {
+          navigate("/login");
+        }
+        return;
+      }
       const res = await axios.get(`${BASE_URL}/profile/view`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
@@ -23,7 +31,10 @@ const Body = () => {
       dispatch(addUser(res.data));
     } catch (err) {
       if (err.status === 401) {
-        navigate("/login");
+        Cookies.remove("token");
+        if (location.pathname !== "/") {
+          navigate("/login");
+        }
       }
       console.error(err);
     }
