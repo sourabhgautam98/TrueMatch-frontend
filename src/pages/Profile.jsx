@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import EditProfile from "./EditProfile";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { BASE_URL } from "../utils/constants";
 import CreatePost from "../components/CreatePost";
 
@@ -10,8 +11,8 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState({}); // Track dropdown state
-  const dropdownRefs = useRef({}); // Refs for each dropdown
+  const [dropdownOpen, setDropdownOpen] = useState({});
+  const dropdownRefs = useRef({});
 
   const handleEditClick = () => setIsEditing(true);
   const handleCloseEdit = () => setIsEditing(false);
@@ -20,7 +21,9 @@ export default function Profile() {
   const fetchMyPosts = async () => {
     setLoading(true);
     try {
+      const token = Cookies.get("token");
       const res = await axios.get(`${BASE_URL}/post/myposts`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       setPosts(res.data);
@@ -35,7 +38,9 @@ export default function Profile() {
   const handleDelete = async (postId) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
+      const token = Cookies.get("token");
       await axios.delete(`${BASE_URL}/post/delete/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       setPosts((prev) => prev.filter((p) => p._id !== postId));
@@ -155,7 +160,7 @@ export default function Profile() {
                 <p className="text-gray-400">Loading posts...</p>
               ) : posts.length === 0 ? (
                 <p className="text-gray-400 italic">
-                  You haven’t created any posts yet
+                  You haven't created any posts yet
                 </p>
               ) : (
                 <div className="flex flex-col gap-6">
@@ -176,11 +181,11 @@ export default function Profile() {
                             <p className="text-white font-semibold">
                               {user.firstName
                                 ? user.firstName.charAt(0).toUpperCase() +
-                                  user.firstName.slice(1).toLowerCase()
+                                user.firstName.slice(1).toLowerCase()
                                 : ""}{" "}
                               {user.lastName
                                 ? user.lastName.charAt(0).toUpperCase() +
-                                  user.lastName.slice(1).toLowerCase()
+                                user.lastName.slice(1).toLowerCase()
                                 : ""}
                             </p>
 

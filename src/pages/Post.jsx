@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { formatDistanceToNow } from "date-fns"; // ✅ for "2 hours ago"
+import Cookies from "js-cookie";
+import { formatDistanceToNow } from "date-fns";
 import { BASE_URL } from "../utils/constants";
 import CreatePost from "../components/CreatePost";
 import { FaRegThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
@@ -16,7 +17,11 @@ const Posts = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(BASE_URL + "/post/allpost", { withCredentials: true });
+      const token = Cookies.get("token");
+      const res = await axios.get(BASE_URL + "/post/allpost", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
       setPosts(res.data);
       setError("");
     } catch (err) {

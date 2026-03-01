@@ -3,6 +3,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
@@ -12,10 +13,14 @@ const Requests = () => {
   const reviewRequest = async (status, _id) => {
     try {
       setProcessingId(_id);
+      const token = Cookies.get("token");
       await axios.post(
         BASE_URL + "/requests/review/" + status + "/" + _id,
         {},
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
       dispatch(removeRequest(_id));
     } catch (err) {
@@ -27,7 +32,9 @@ const Requests = () => {
 
   const fetchRequests = async () => {
     try {
+      const token = Cookies.get("token");
       const res = await axios.get(BASE_URL + "/users/requests/received", {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       dispatch(addRequests(res.data.data));
@@ -101,7 +108,7 @@ const Requests = () => {
                     <h2 className="text-2xl font-bold text-white mb-2">
                       {firstName + " " + lastName}
                     </h2>
-                    
+
                     <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mb-3">
                       {age && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900/50 text-blue-200 text-sm">
@@ -111,7 +118,7 @@ const Requests = () => {
                           {age} years
                         </span>
                       )}
-                      
+
                       {gender && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-900/50 text-purple-200 text-sm">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,11 +139,10 @@ const Requests = () => {
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row md:flex-col gap-3 justify-center w-full md:w-auto">
                     <button
-                      className={`px-6 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 ${
-                        processingId === request._id 
-                          ? "bg-gray-700 text-gray-400 cursor-not-allowed" 
+                      className={`px-6 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 ${processingId === request._id
+                          ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                           : "bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg"
-                      }`}
+                        }`}
                       onClick={() => reviewRequest("rejected", request._id)}
                       disabled={processingId === request._id}
                     >
@@ -157,13 +163,12 @@ const Requests = () => {
                         </>
                       )}
                     </button>
-                    
+
                     <button
-                      className={`px-6 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 ${
-                        processingId === request._id 
-                          ? "bg-gray-700 text-gray-400 cursor-not-allowed" 
+                      className={`px-6 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 ${processingId === request._id
+                          ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg"
-                      }`}
+                        }`}
                       onClick={() => reviewRequest("accepted", request._id)}
                       disabled={processingId === request._id}
                     >

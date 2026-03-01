@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import { useDispatch } from "react-redux";
@@ -21,6 +22,7 @@ const EditProfile = ({ user, onClose }) => {
     setError("");
     setMessage("");
     try {
+      const token = Cookies.get("token");
       const res = await axios.patch(
         BASE_URL + "/profile/edit",
         {
@@ -31,7 +33,10 @@ const EditProfile = ({ user, onClose }) => {
           gender,
           skills,
         },
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
 
       dispatch(addUser(res.data.data));

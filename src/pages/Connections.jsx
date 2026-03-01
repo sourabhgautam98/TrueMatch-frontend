@@ -3,6 +3,7 @@ import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionsSlice";
+import Cookies from "js-cookie";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections);
@@ -12,7 +13,9 @@ const Connections = () => {
 
   const fetchConnections = async () => {
     try {
+      const token = Cookies.get("token");
       const res = await axios.get(BASE_URL + "/users/connections", {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       dispatch(addConnections(res.data.data));
@@ -54,7 +57,7 @@ const Connections = () => {
         <ul className="space-y-4">
           {connections.map((connection) => {
             if (!connection || typeof connection !== "object") return null;
-            const { _id, firstName, lastName, photoUrl, age, gender} = connection;
+            const { _id, firstName, lastName, photoUrl, age, gender } = connection;
 
             return (
               <li
@@ -98,7 +101,7 @@ const Connections = () => {
         >
           <div
             className="bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-xl border border-blue-700/30 relative"
-            onClick={(e) => e.stopPropagation()} 
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setSelectedUser(null)}
@@ -121,7 +124,7 @@ const Connections = () => {
                 {selectedUser.age && selectedUser.gender ? "•" : ""}{" "}
                 {selectedUser.gender
                   ? selectedUser.gender.charAt(0).toUpperCase() +
-                    selectedUser.gender.slice(1)
+                  selectedUser.gender.slice(1)
                   : ""}
               </p>
 

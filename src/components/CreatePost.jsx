@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { BASE_URL } from "../utils/constants";
 
 const CreatePost = ({ onPostCreated }) => {
@@ -22,13 +23,17 @@ const CreatePost = ({ onPostCreated }) => {
     setError("");
 
     try {
+      const token = Cookies.get("token");
       const res = await axios.post(
         BASE_URL + "/post/create",
         {
           description: description.trim(),
           image: url.trim() || null,
         },
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
 
       setDescription("");
@@ -67,12 +72,11 @@ const CreatePost = ({ onPostCreated }) => {
         <div className="flex-1 w-full">
           <h2 className="text-lg font-semibold text-white mb-2">
             {user
-              ? `Something on your mind, ${
-                  user.firstName
-                    ? user.firstName.charAt(0).toUpperCase() +
-                      user.firstName.slice(1).toLowerCase()
-                    : ""
-                }?`
+              ? `Something on your mind, ${user.firstName
+                ? user.firstName.charAt(0).toUpperCase() +
+                user.firstName.slice(1).toLowerCase()
+                : ""
+              }?`
               : "Create Post"}
           </h2>
 
@@ -127,11 +131,10 @@ const CreatePost = ({ onPostCreated }) => {
             <button
               type="submit"
               disabled={!description.trim() || creatingPost}
-              className={`px-5 py-2 rounded-lg transition ${
-                !description.trim() || creatingPost
+              className={`px-5 py-2 rounded-lg transition ${!description.trim() || creatingPost
                   ? "bg-gray-600 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-              } text-white`}
+                } text-white`}
             >
               {creatingPost ? "Posting..." : "Post"}
             </button>

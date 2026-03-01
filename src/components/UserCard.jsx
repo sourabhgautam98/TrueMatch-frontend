@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 import { useState } from "react";
@@ -14,10 +15,14 @@ const UserCard = ({ user, onActionComplete }) => {
     try {
       setProcessing(true);
       setActionType(status);
+      const token = Cookies.get("token");
       await axios.post(
         `${BASE_URL}/requests/send/${status}/${userId}`,
         {},
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
       dispatch(removeUserFromFeed(userId));
       if (onActionComplete) onActionComplete(userId);
@@ -33,8 +38,8 @@ const UserCard = ({ user, onActionComplete }) => {
     typeof skills === "string"
       ? skills.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
       : Array.isArray(skills)
-      ? skills
-      : [];
+        ? skills
+        : [];
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-blue-900/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
@@ -88,22 +93,20 @@ const UserCard = ({ user, onActionComplete }) => {
         <button
           onClick={() => handleSendRequest("ignored", _id)}
           disabled={processing}
-          className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${
-            processing && actionType === "ignored"
+          className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${processing && actionType === "ignored"
               ? "bg-gray-700 text-gray-400 cursor-not-allowed"
               : "bg-gray-700 hover:bg-gray-800 text-white"
-          }`}
+            }`}
         >
           {processing && actionType === "ignored" ? "Processing..." : "Ignore"}
         </button>
         <button
           onClick={() => handleSendRequest("interested", _id)}
           disabled={processing}
-          className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${
-            processing && actionType === "interested"
+          className={`flex-1 px-4 py-2 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ${processing && actionType === "interested"
               ? "bg-gray-700 text-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 text-white"
-          }`}
+            }`}
         >
           {processing && actionType === "interested" ? "Sending..." : "Interested"}
         </button>

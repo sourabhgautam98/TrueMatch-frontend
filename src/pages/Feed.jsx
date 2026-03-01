@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import { useEffect, useState } from "react";
 import UserCard from "../components/UserCard";
+import Cookies from "js-cookie";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
@@ -15,7 +16,9 @@ const Feed = () => {
   const getFeed = async () => {
     try {
       setLoading(true);
+      const token = Cookies.get("token");
       const res = await axios.get(`${BASE_URL}/users/feed`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       dispatch(addFeed(res?.data?.data || []));
@@ -40,9 +43,9 @@ const Feed = () => {
 
   const filteredFeed = feed
     ? feed.filter((user) => {
-        const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
-        return fullName.toLowerCase().includes(searchTerm.toLowerCase());
-      })
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+      return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+    })
     : [];
 
   if (loading) {
